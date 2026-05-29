@@ -1,0 +1,19 @@
+{
+  "domain": "magnum_w_controller",
+  "name": "Magnum W Controller",
+  "codeowners": [
+    "@thijsdejong"
+  ],
+  "config_flow": true,
+  "dhcp": [
+    {
+      "hostname": "magnum_w-controller*"
+    }
+  ],
+  "documentation": "https://github.com/desync-dev/home-assistant-magnum-w-controller",
+  "integration_type": "hub",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/desync-dev/home-assistant-magnum-w-controller/issues",
+  "requirements": [],
+  "version": "2026.5.0"
+}

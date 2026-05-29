@@ -1,46 +1,71 @@
-# Notice
+# Magnum W Controller
 
-The component and platforms in this repository are not meant to be used by a
-user, but as a "blueprint" that custom component developers can build
-upon, to make more awesome stuff.
+[![Validate](https://github.com/desync-dev/home-assistant-magnum-w-controller/actions/workflows/validate.yml/badge.svg)](https://github.com/desync-dev/home-assistant-magnum-w-controller/actions/workflows/validate.yml)
+[![Lint](https://github.com/desync-dev/home-assistant-magnum-w-controller/actions/workflows/lint.yml/badge.svg)](https://github.com/desync-dev/home-assistant-magnum-w-controller/actions/workflows/lint.yml)
 
-HAVE FUN! 😎
+Home Assistant custom integration for the **Magnum W Controller**, the hub for
+Magnum wireless underfloor-heating thermostats.
 
-## Why?
+It talks to the controller's local JSON-RPC API (no cloud), discovers every
+control unit and heating zone, and exposes them to Home Assistant.
 
-This is simple, by having custom_components look (README + structure) the same
-it is easier for developers to help each other and for users to start using them.
+## Features
 
-If you are a developer and you want to add things to this "blueprint" that you think more
-developers will have use for, please open a PR to add it :)
+- **Local polling** over the LAN — no cloud account required.
+- **Automatic DHCP discovery** of the controller (with manual host entry as a
+  fallback).
+- A **`climate` entity per zone** — current temperature, target temperature,
+  heating/cooling action, and per-zone min/max limits.
+- **Diagnostic sensors** — battery level and signal strength per thermostat,
+  signal strength per control unit, plus a temperature sensor per zone.
+- A device per control unit, with each thermostat linked to its control unit in
+  the device registry.
 
-## What?
+## Installation
 
-This repository contains multiple files, here is a overview:
+### HACS (recommended)
 
-File | Purpose | Documentation
--- | -- | --
-`.devcontainer.json` | Used for development/testing with Visual Studio Code. | [Documentation](https://code.visualstudio.com/docs/remote/containers)
-`.github/ISSUE_TEMPLATE/*.yml` | Templates for the issue tracker | [Documentation](https://help.github.com/en/github/building-a-strong-community/configuring-issue-templates-for-your-repository)
-`custom_components/integration_blueprint/*` | Integration files, this is where everything happens. | [Documentation](https://developers.home-assistant.io/docs/creating_component_index)
-`CONTRIBUTING.md` | Guidelines on how to contribute. | [Documentation](https://help.github.com/en/github/building-a-strong-community/setting-guidelines-for-repository-contributors)
-`LICENSE` | The license file for the project. | [Documentation](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/licensing-a-repository)
-`README.md` | The file you are reading now, should contain info about the integration, installation and configuration instructions. | [Documentation](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax)
-`requirements.txt` | Python packages used for development/lint/testing this integration. | [Documentation](https://pip.pypa.io/en/stable/user_guide/#requirements-files)
+1. Add this repository to HACS as a custom repository (category: *Integration*).
+2. Search for **Magnum W Controller** and install it.
+3. Restart Home Assistant.
 
-## How?
+### Manual
 
-1. Create a new repository in GitHub, using this repository as a template by clicking the "Use this template" button in the GitHub UI.
-1. Open your new repository in Visual Studio Code devcontainer (Preferably with the "`Dev Containers: Clone Repository in Named Container Volume...`" option).
-1. Rename all instances of the `integration_blueprint` to `custom_components/<your_integration_domain>` (e.g. `custom_components/awesome_integration`).
-1. Rename all instances of the `Integration Blueprint` to `<Your Integration Name>` (e.g. `Awesome Integration`).
-1. Run the `scripts/develop` to start HA and test out your new integration.
+1. Copy `custom_components/magnum_w_controller` into your Home Assistant `config/custom_components` directory.
+2. Restart Home Assistant.
 
-## Next steps
+## Configuration
 
-These are some next steps you may want to look into:
-- Add tests to your integration, [`pytest-homeassistant-custom-component`](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component) can help you get started.
-- Add brand images (logo/icon).
-- Create your first release.
-- Share your integration on the [Home Assistant Forum](https://community.home-assistant.io/).
-- Submit your integration to [HACS](https://hacs.xyz/docs/publish/start).
+The integration is configured entirely from the UI.
+
+- If the controller is on your network, Home Assistant will usually **discover
+  it automatically** via DHCP — accept the discovery prompt.
+- Otherwise go to **Settings → Devices & Services → Add Integration**, search
+  for **Magnum W Controller**, and enter its IP address or hostname.
+
+## Development
+
+This integration is based on the
+[integration_blueprint](https://github.com/ludeeus/integration_blueprint)
+template and ships with a VS Code dev container that runs a standalone Home
+Assistant instance pre-configured with this integration.
+
+```bash
+scripts/setup     # install dependencies
+scripts/develop   # start Home Assistant with this integration loaded
+scripts/lint      # format and lint with ruff
+```
+
+### Tests
+
+Tests use
+[`pytest-homeassistant-custom-component`](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component).
+
+```bash
+pip install -r requirements.txt
+pytest
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md).

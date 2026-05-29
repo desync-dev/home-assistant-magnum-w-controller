@@ -1,0 +1,32 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "Magnum W Controller",
+        "description": "Enter the IP address or hostname of your Magnum W Controller on the local network.",
+        "data": {
+          "host": "Host"
+        }
+      },
+      "discovery_confirm": {
+        "title": "Magnum W Controller",
+        "description": "Do you want to set up {name} discovered at {host}?"
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the controller. Check the address and that it is reachable."
+    },
+    "abort": {
+      "already_configured": "This controller is already configured.",
+      "cannot_connect": "Failed to connect to the discovered controller."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "signal_strength": {
+        "name": "Signal"
+      }
+    }
+  }
+}

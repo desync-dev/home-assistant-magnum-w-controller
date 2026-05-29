@@ -15,6 +15,19 @@ ignore = [
     "ISC001", # incompatible with formatter
 ]
 
+[lint.per-file-ignores]
+# Tests follow a looser style, mirroring home-assistant/core conventions.
+"tests/**" = [
+    "S101",    # asserts are the whole point of a test
+    "PLR2004", # magic values in assertions are clearer inline
+    "ANN",     # type annotations are not required in tests
+    "ARG",     # fixtures/fakes routinely take unused arguments
+    "D",       # docstring rules are relaxed for tests
+    "TC",      # runtime imports are fine in tests
+    "PYI034",  # fakes may narrow async context-manager return types
+    "E501",    # long, descriptive assertions are acceptable
+]
+
 [lint.flake8-pytest-style]
 fixture-parentheses = false
 
