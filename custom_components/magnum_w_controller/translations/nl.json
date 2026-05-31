@@ -1,0 +1,32 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "Magnum W Controller",
+        "description": "Voer het IP-adres of de hostnaam in van je Magnum W Controller op het lokale netwerk.",
+        "data": {
+          "host": "Host"
+        }
+      },
+      "discovery_confirm": {
+        "title": "Magnum W Controller",
+        "description": "Wil je {name} instellen die is gevonden op {host}?"
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan geen verbinding maken met de controller. Controleer het adres en of deze bereikbaar is."
+    },
+    "abort": {
+      "already_configured": "Deze controller is al geconfigureerd.",
+      "cannot_connect": "Kan geen verbinding maken met de gevonden controller."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "signal_strength": {
+        "name": "Signaal"
+      }
+    }
+  }
+}
