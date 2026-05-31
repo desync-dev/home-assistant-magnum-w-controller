@@ -20,9 +20,8 @@ _MAC = "aabbccddeeff"
 
 def _dhcp_info(ip: str = "1.2.3.4") -> DhcpServiceInfo:
     """Build a DHCP discovery payload for the test controller."""
-    return DhcpServiceInfo(
-        ip=ip, hostname="magnum_w-controller", macaddress=_MAC
-    )
+    return DhcpServiceInfo(ip=ip, hostname="magnum_w-controller", macaddress=_MAC)
+
 
 _SYSTEM_NAME = "custom_components.magnum_w_controller.config_flow.MagnumClient.async_get_system_name"
 
