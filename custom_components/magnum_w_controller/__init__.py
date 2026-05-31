@@ -5,11 +5,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from homeassistant.const import Platform
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import MagnumClient
 from .const import CONF_HOST
 from .coordinator import MagnumCoordinator
+from .entity import control_unit_device_info
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -28,6 +30,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: MagnumConfigEntry) -> bo
     await coordinator.async_config_entry_first_refresh()
 
     entry.runtime_data = coordinator
+
+    # Register the control unit devices up front so the zone devices, which
+    # reference them via ``via_device``, never point at a not-yet-created
+    # device while the platforms are being set up.
+    device_registry = dr.async_get(hass)
+    for unit in coordinator.data.control_units:
+        device_registry.async_get_or_create(
+            config_entry_id=entry.entry_id,
+            **control_unit_device_info(entry.entry_id, unit),
+        )
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
