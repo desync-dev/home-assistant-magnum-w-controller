@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -33,6 +34,12 @@ async def test_setup_and_unload(hass: HomeAssistant, sample_data: MagnumData) ->
     entities = er.async_entries_for_config_entry(ent_reg, entry.entry_id)
     # 2 climate + 2 zones * 3 sensors + 1 CU * 1 sensor = 9
     assert len(entities) == 9
+
+    # The Ethernet-connected CU 0 carries the controller's version string.
+    dev_reg = dr.async_get(hass)
+    cu0 = dev_reg.async_get_device(identifiers={(DOMAIN, f"{entry.entry_id}_cu_0")})
+    assert cu0 is not None
+    assert cu0.sw_version == "firmware 1.1.186 / app 201109-0850"
 
     assert await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()

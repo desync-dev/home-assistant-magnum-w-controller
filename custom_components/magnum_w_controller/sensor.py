@@ -185,7 +185,11 @@ class MagnumCuSensor(CoordinatorEntity[MagnumCoordinator], SensorEntity):
     def device_info(self) -> DeviceInfo | None:
         """Device entry for the control unit this sensor belongs to."""
         unit = self._unit
-        return control_unit_device_info(self._entry_id, unit) if unit else None
+        if unit is None:
+            return None
+        return control_unit_device_info(
+            self._entry_id, unit, self.coordinator.data.sw_version
+        )
 
     @property
     def native_value(self) -> float | int | None:
