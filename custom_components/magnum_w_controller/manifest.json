@@ -7,7 +7,7 @@
   "config_flow": true,
   "dhcp": [
     {
-      "hostname": "magnum_w-controller*"
+      "hostname": "magnum[_-]w-controller*"
     }
   ],
   "documentation": "https://github.com/desync-dev/home-assistant-magnum-w-controller",
