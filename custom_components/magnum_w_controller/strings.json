@@ -11,7 +11,7 @@
       },
       "discovery_confirm": {
         "title": "Magnum W Controller",
-        "description": "Do you want to set up {name} discovered at {host}?"
+        "description": "Do you want to set up the Magnum W Controller discovered at {host}?"
       }
     },
     "error": {
@@ -19,7 +19,7 @@
     },
     "abort": {
       "already_configured": "This controller is already configured.",
-      "cannot_connect": "Failed to connect to the discovered controller."
+      "already_in_progress": "This controller is already being set up."
     }
   },
   "entity": {
