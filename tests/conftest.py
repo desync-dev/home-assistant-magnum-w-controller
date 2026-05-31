@@ -30,6 +30,8 @@ def sample_data() -> MagnumData:
     """A representative controller snapshot: one CU, one heating + one cooling zone."""
     return MagnumData(
         system_name="Test Magnum",
+        firmware_version="1.1.186",
+        app_version="201109-0850",
         control_units=[
             ControlUnit(cu_index=0, name="CU One", link_quality=3),
         ],

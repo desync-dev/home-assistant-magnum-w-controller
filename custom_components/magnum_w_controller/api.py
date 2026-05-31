@@ -11,6 +11,9 @@ Addressing summary
 ------------------
 * System object 0 / property 4 -> number of Control Units (CUs).
 * System object 0 / property 5 -> system name.
+* Object 9990 / property 5 -> firmware version (e.g. "1.1.186").
+* Object 9991 / property 5 -> application build stamp (e.g. "201109-0850").
+  Both belong to the LAN-connected CU 0 (see ``ETHERNET_CU_INDEX``).
 * CU ``s`` (0-based): object ``100 + s`` / property 4 = 8-bit mask of active
   zones. A zone's global 1-based id is ``r = s * 8 + (bit + 1)``.
 * CU objects use ``initialId + offset * s`` (offset 1):
@@ -45,6 +48,16 @@ MANUAL_ZONE_MODE = 2
 DEFAULT_MIN_TEMP = 5.0
 DEFAULT_MAX_TEMP = 35.0
 
+# The first control unit (cu_index 0) is the LAN-connected box that serves the
+# web UI and owns the device MAC; the controller's version strings belong to it.
+ETHERNET_CU_INDEX = 0
+
+# Object ids holding the controller's version strings (property 5): the
+# firmware revision (e.g. "1.1.186") and the application build stamp
+# (e.g. "201109-0850").
+FIRMWARE_OBJ = 9990
+APP_OBJ = 9991
+
 
 class MagnumApiError(Exception):
     """Raised when the controller cannot be reached or returns an error."""
@@ -72,6 +85,11 @@ class ControlUnit:
     def unique_key(self) -> str:
         """Stable per-entry key for this control unit."""
         return f"cu_{self.cu_index}"
+
+    @property
+    def is_ethernet_gateway(self) -> bool:
+        """Whether this CU is the LAN-connected controller (serves the web UI)."""
+        return self.cu_index == ETHERNET_CU_INDEX
 
     @property
     def link_quality_pct(self) -> int | None:
@@ -121,8 +139,20 @@ class MagnumData:
     """Snapshot of the whole controller returned by a single refresh."""
 
     system_name: str
+    firmware_version: str | None
+    app_version: str | None
     control_units: list[ControlUnit]
     zones: list[Zone]
+
+    @property
+    def sw_version(self) -> str | None:
+        """Combined firmware/app version string for the controller's device."""
+        parts: list[str] = []
+        if self.firmware_version:
+            parts.append(f"firmware {self.firmware_version}")
+        if self.app_version:
+            parts.append(f"app {self.app_version}")
+        return " / ".join(parts) or None
 
 
 class MagnumClient:
@@ -197,6 +227,16 @@ class MagnumClient:
         """Read the controller's configured system name."""
         values = await self._read_values([(0, 5)])
         return str(values.get((0, 5), "Magnum W Controller"))
+
+    async def async_get_versions(self) -> tuple[str | None, str | None]:
+        """Read the controller's firmware and application version strings."""
+        values = await self._read_values([(FIRMWARE_OBJ, 5), (APP_OBJ, 5)])
+        firmware = values.get((FIRMWARE_OBJ, 5))
+        app = values.get((APP_OBJ, 5))
+        return (
+            str(firmware) if firmware is not None else None,
+            str(app) if app is not None else None,
+        )
 
     async def _async_number_of_cus(self) -> int:
         values = await self._read_values([(0, 4)])
@@ -289,10 +329,13 @@ class MagnumClient:
         """Fetch a full snapshot of the controller."""
         num_cu = await self._async_number_of_cus()
         system_name = await self.async_get_system_name()
+        firmware_version, app_version = await self.async_get_versions()
         control_units = await self.async_get_control_units(num_cu)
         zones = await self.async_get_zones(num_cu)
         return MagnumData(
             system_name=system_name,
+            firmware_version=firmware_version,
+            app_version=app_version,
             control_units=control_units,
             zones=zones,
         )

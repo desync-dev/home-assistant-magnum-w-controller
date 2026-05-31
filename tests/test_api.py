@@ -25,6 +25,8 @@ from custom_components.magnum_w_controller.api import (
 DEVICE_STATE: dict[tuple[int, int], Any] = {
     (0, 4): 1,  # number of control units
     (0, 5): "Test Magnum",  # system name
+    (9990, 5): "1.1.186",  # firmware version
+    (9991, 5): "201109-0850",  # application build stamp
     (1, 5): "CU One",  # CU 0 name
     (108, 4): 3,  # CU 0 link quality
     (100, 4): 0b00000011,  # CU 0 active-zone mask -> zones 1 and 2
@@ -113,15 +115,31 @@ async def test_async_get_system_name() -> None:
     assert await client.async_get_system_name() == "Test Magnum"
 
 
+async def test_async_get_versions() -> None:
+    """Firmware and app build are read from objects 9990 / 9991 / property 5."""
+    client = make_client()
+    assert await client.async_get_versions() == ("1.1.186", "201109-0850")
+
+
+async def test_async_get_versions_missing() -> None:
+    """Absent version objects yield None rather than raising."""
+    client = make_client(state={(0, 4): 0, (0, 5): "Test Magnum"})
+    assert await client.async_get_versions() == (None, None)
+
+
 async def test_async_update_full_snapshot() -> None:
     """A full update parses control units and zones with scaled values."""
     client = make_client()
     data = await client.async_update()
 
     assert data.system_name == "Test Magnum"
+    assert data.firmware_version == "1.1.186"
+    assert data.app_version == "201109-0850"
+    assert data.sw_version == "firmware 1.1.186 / app 201109-0850"
     assert len(data.control_units) == 1
     cu = data.control_units[0]
     assert cu.name == "CU One"
+    assert cu.is_ethernet_gateway is True
     assert cu.link_quality_pct == 100
 
     assert len(data.zones) == 2

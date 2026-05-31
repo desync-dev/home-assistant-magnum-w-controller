@@ -38,7 +38,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: MagnumConfigEntry) -> bo
     for unit in coordinator.data.control_units:
         device_registry.async_get_or_create(
             config_entry_id=entry.entry_id,
-            **control_unit_device_info(entry.entry_id, unit),
+            **control_unit_device_info(
+                entry.entry_id, unit, coordinator.data.sw_version
+            ),
         )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
