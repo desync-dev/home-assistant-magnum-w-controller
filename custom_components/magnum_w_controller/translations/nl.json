@@ -11,7 +11,7 @@
       },
       "discovery_confirm": {
         "title": "Magnum W Controller",
-        "description": "Wil je {name} instellen die is gevonden op {host}?"
+        "description": "Wil je de Magnum W Controller instellen die is gevonden op {host}?"
       }
     },
     "error": {
@@ -19,7 +19,7 @@
     },
     "abort": {
       "already_configured": "Deze controller is al geconfigureerd.",
-      "cannot_connect": "Kan geen verbinding maken met de gevonden controller."
+      "already_in_progress": "Deze controller wordt al ingesteld."
     }
   },
   "entity": {
