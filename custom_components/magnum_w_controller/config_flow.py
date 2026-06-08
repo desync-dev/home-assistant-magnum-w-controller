@@ -3,12 +3,16 @@ Config flow for the Magnum W Controller integration.
 
 Supports two entry points:
 
-* Automatic **DHCP discovery** — the controller presents the DHCP hostname
-  ``Magnum_W-Controller`` (see the ``dhcp`` matcher in ``manifest.json``). The
-  MAC address from the DHCP lease is used as a stable ``unique_id`` so the
-  config entry survives IP changes. Per Home Assistant's discovery rules, the
-  discovery step performs no network I/O and never finishes the flow — the
-  controller is only contacted once the user confirms.
+* Automatic **DHCP discovery** — primarily by the controller's MAC OUI
+  (``0022A8*``, Ouman Oy), with the DHCP hostname ``Magnum_W-Controller`` as a
+  secondary matcher (see ``manifest.json``). The OUI is what makes discovery
+  fire reliably: Home Assistant's always-on network scan learns hostnames via
+  reverse DNS, and the controller's hostname contains an underscore — illegal
+  in DNS — so it rarely arrives in matchable form, whereas the MAC is always
+  present from ARP. The MAC then doubles as a stable ``unique_id`` so the config
+  entry survives IP changes. Per Home Assistant's discovery rules, the discovery
+  step performs no network I/O and never finishes the flow — the controller is
+  only contacted once the user confirms.
 * Manual setup — the user types the host; the host doubles as the ``unique_id``.
 
 A controller added manually is keyed by its host. When that same controller is
