@@ -9,6 +9,13 @@ Magnum wireless underfloor-heating thermostats.
 It talks to the controller's local JSON-RPC API, discovers every control unit
 and heating zone, and exposes them to Home Assistant.
 
+## Support
+
+If you find this integration useful, you can support my work:
+
+[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-desyncdotdev-EA4AAA?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/desyncdotdev)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-desyncdotdev-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/desyncdotdev)
+
 ## Features
 
 - **Automatic DHCP discovery** of the controller (with manual host entry as a
