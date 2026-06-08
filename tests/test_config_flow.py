@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from unittest.mock import patch
+from collections.abc import Generator
+from unittest.mock import AsyncMock, patch
 
+import pytest
 from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
@@ -18,6 +20,16 @@ from custom_components.magnum_w_controller.const import CONF_HOST, DOMAIN
 _MAC = "aabbccddeeff"
 
 
+@pytest.fixture
+def mock_setup_entry() -> Generator[AsyncMock]:
+    """Override async_setup_entry."""
+    with patch(
+        "custom_components.magnum_w_controller.async_setup_entry",
+        return_value=True,
+    ) as mock_setup_entry:
+        yield mock_setup_entry
+
+
 def _dhcp_info(ip: str = "1.2.3.4") -> DhcpServiceInfo:
     """Build a DHCP discovery payload for the test controller."""
     return DhcpServiceInfo(ip=ip, hostname="magnum_w-controller", macaddress=_MAC)
@@ -26,7 +38,9 @@ def _dhcp_info(ip: str = "1.2.3.4") -> DhcpServiceInfo:
 _SYSTEM_NAME = "custom_components.magnum_w_controller.config_flow.MagnumClient.async_get_system_name"
 
 
-async def test_user_flow_success(hass: HomeAssistant) -> None:
+async def test_user_flow_success(
+    hass: HomeAssistant, mock_setup_entry: AsyncMock
+) -> None:
     """A valid host creates an entry titled with the system name."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -43,9 +57,12 @@ async def test_user_flow_success(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["title"] == "My Magnum"
     assert result["data"] == {CONF_HOST: "1.2.3.4"}
+    assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_flow_cannot_connect(hass: HomeAssistant) -> None:
+async def test_user_flow_cannot_connect(
+    hass: HomeAssistant, mock_setup_entry: AsyncMock
+) -> None:
     """A connection failure shows a form error and lets the user retry."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -64,8 +81,10 @@ async def test_user_flow_cannot_connect(hass: HomeAssistant) -> None:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {CONF_HOST: "1.2.3.4"}
         )
+        await hass.async_block_till_done()
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert len(mock_setup_entry.mock_calls) == 1
 
 
 async def test_user_flow_already_configured(hass: HomeAssistant) -> None:
@@ -86,7 +105,9 @@ async def test_user_flow_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_dhcp_discovery_flow(hass: HomeAssistant) -> None:
+async def test_dhcp_discovery_flow(
+    hass: HomeAssistant, mock_setup_entry: AsyncMock
+) -> None:
     """A DHCP discovery is confirmed and creates an entry keyed by MAC.
 
     The controller must not be contacted until the user confirms, so the
@@ -108,9 +129,12 @@ async def test_dhcp_discovery_flow(hass: HomeAssistant) -> None:
     assert result["title"] == "My Magnum"
     assert result["data"] == {CONF_HOST: "1.2.3.4"}
     assert result["result"].unique_id == format_mac(_MAC)
+    assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_dhcp_discovery_cannot_connect(hass: HomeAssistant) -> None:
+async def test_dhcp_discovery_cannot_connect(
+    hass: HomeAssistant, mock_setup_entry: AsyncMock
+) -> None:
     """A controller unreachable on confirmation shows a form error, not abort."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_DHCP}, data=_dhcp_info()
@@ -130,6 +154,7 @@ async def test_dhcp_discovery_cannot_connect(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert len(mock_setup_entry.mock_calls) == 1
 
 
 async def test_dhcp_updates_host_on_ip_change(hass: HomeAssistant) -> None:
