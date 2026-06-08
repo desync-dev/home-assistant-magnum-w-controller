@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from unittest.mock import patch
 
+import pytest
 from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
@@ -16,6 +18,16 @@ from custom_components.magnum_w_controller.config_flow import MagnumConfigFlow
 from custom_components.magnum_w_controller.const import CONF_HOST, DOMAIN
 
 _MAC = "aabbccddeeff"
+
+
+@pytest.fixture(autouse=True)
+def mock_setup_entry() -> Iterator[None]:
+    """Stop entry creation from setting up the integration and hitting the network."""
+    with patch(
+        "custom_components.magnum_w_controller.async_setup_entry",
+        return_value=True,
+    ):
+        yield
 
 
 def _dhcp_info(ip: str = "1.2.3.4") -> DhcpServiceInfo:
