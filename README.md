@@ -6,12 +6,11 @@
 Home Assistant custom integration for the **Magnum W Controller**, the hub for
 Magnum wireless underfloor-heating thermostats.
 
-It talks to the controller's local JSON-RPC API (no cloud), discovers every
-control unit and heating zone, and exposes them to Home Assistant.
+It talks to the controller's local JSON-RPC API, discovers every control unit
+and heating zone, and exposes them to Home Assistant.
 
 ## Features
 
-- **Local polling** over the LAN — no cloud account required.
 - **Automatic DHCP discovery** of the controller (with manual host entry as a
   fallback).
 - A **`climate` entity per zone** — current temperature, target temperature,
